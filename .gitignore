@@ -54,3 +54,6 @@ coverage
 *.pid
 *.seed
 *.pid.lock 
+
+# Docker volume for Postgres
+.data
