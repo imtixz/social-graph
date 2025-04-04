@@ -1,0 +1,19 @@
+{
+  "name": "@social-graph/migrator",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "migrate": "node-pg-migrate -j ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "pg": "^8.14.1"
+  },
+  "devDependencies": {
+    "node-pg-migrate": "^7.9.1",
+    "ts-node": "^10.9.2"
+  }
+}
