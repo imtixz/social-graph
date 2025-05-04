@@ -74,7 +74,6 @@ app.get("/api/contact", async (req, res) => {
       .where("user_id", "=", Number(userId))
       .execute();
 
-    // You can now use userId for further processing
     console.log(userId);
     res.json({
       contacts,
@@ -106,7 +105,7 @@ app.post("/api/contact", async (req, res) => {
       address,
       dateOfBirth,
       emailAddresses,
-      phoneNumbers,
+      phones,
       facebooks,
       instagrams,
       twitters,
@@ -116,7 +115,7 @@ app.post("/api/contact", async (req, res) => {
       address: string;
       dateOfBirth: string;
       emailAddresses: string[];
-      phoneNumbers: string[];
+      phones: string[];
       facebooks: string[];
       instagrams: string[];
       twitters: string[];
@@ -139,7 +138,7 @@ app.post("/api/contact", async (req, res) => {
 
     if (!contact) throw new Error();
 
-    if (emailAddresses.length) {
+    if (emailAddresses?.length) {
       for (const email of emailAddresses) {
         await db
           .insertInto("contact_emails")
@@ -151,8 +150,8 @@ app.post("/api/contact", async (req, res) => {
       }
     }
 
-    if (phoneNumbers.length) {
-      for (const phone of phoneNumbers) {
+    if (phones?.length) {
+      for (const phone of phones) {
         await db
           .insertInto("contact_phones")
           .values({
@@ -163,7 +162,7 @@ app.post("/api/contact", async (req, res) => {
       }
     }
 
-    if (facebooks.length) {
+    if (facebooks?.length) {
       for (const url of facebooks) {
         await db
           .insertInto("contact_socials")
@@ -176,7 +175,7 @@ app.post("/api/contact", async (req, res) => {
       }
     }
 
-    if (instagrams.length) {
+    if (instagrams?.length) {
       for (const url of instagrams) {
         await db
           .insertInto("contact_socials")
@@ -189,7 +188,7 @@ app.post("/api/contact", async (req, res) => {
       }
     }
 
-    if (twitters.length) {
+    if (twitters?.length) {
       for (const url of twitters) {
         await db
           .insertInto("contact_socials")
@@ -202,7 +201,7 @@ app.post("/api/contact", async (req, res) => {
       }
     }
 
-    if (linkedins.length) {
+    if (linkedins?.length) {
       for (const url of linkedins) {
         await db
           .insertInto("contact_socials")
@@ -224,16 +223,248 @@ app.post("/api/contact", async (req, res) => {
   }
 });
 
-app.get("/api/contact/:id", (req, res) => {
-  // gets all details for a particular contact
+app.get("/api/contact/:id", async (req, res) => {
+  const authHeader = req.headers.authorization;
+
+  const contactId = req.params.id;
+
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    res.status(401).json({ error: "Unauthorized" });
+    return;
+  }
+
+  const token = authHeader.split(" ")[1];
+  try {
+    const decoded = jwt.verify(token, SECRET_KEY) as { id: string };
+    const userId = decoded.id;
+
+    if (!userId) throw new Error();
+
+    const contact = await db
+      .selectFrom("contacts")
+      .selectAll()
+      .where("id", "=", Number(contactId))
+      .executeTakeFirst();
+
+    const phones = await db
+      .selectFrom("contact_phones")
+      .selectAll()
+      .where("contact_id", "=", Number(contactId))
+      .execute();
+
+    const emailAddresses = await db
+      .selectFrom("contact_emails")
+      .selectAll()
+      .where("contact_id", "=", Number(contactId))
+      .execute();
+
+    const socials = await db
+      .selectFrom("contact_socials")
+      .selectAll()
+      .where("contact_id", "=", Number(contactId))
+      .execute();
+
+    res.json({
+      contact,
+      phones,
+      emailAddresses,
+      socials,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(401).json({ error: "Failed to get contact's details" });
+  }
 });
 
-app.post("/api/contact/:id", (req, res) => {
-  // updates a detail about the contact
+app.post("/api/contact/:id", async (req, res) => {
+  const authHeader = req.headers.authorization;
+
+  const contactId = req.params.id;
+
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    res.status(401).json({ error: "Unauthorized" });
+    return;
+  }
+
+  const token = authHeader.split(" ")[1];
+
+  try {
+    const decoded = jwt.verify(token, SECRET_KEY) as { id: string };
+    const userId = decoded.id;
+
+    if (!userId) throw new Error();
+
+    const {
+      name,
+      address,
+      dateOfBirth,
+      emailAddresses,
+      phones,
+      facebooks,
+      instagrams,
+      twitters,
+      linkedins,
+    }: {
+      name: string;
+      address: string;
+      dateOfBirth: string;
+      emailAddresses: string[];
+      phones: string[];
+      facebooks: string[];
+      instagrams: string[];
+      twitters: string[];
+      linkedins: string[];
+    } = req.body;
+
+    const contact = await db
+      .updateTable("contacts")
+      .where("id", "=", Number(contactId))
+      .set({
+        name: name,
+        address: address,
+        date_of_birth: new Date(dateOfBirth),
+        user_id: Number(userId),
+      })
+      .returning(["id"])
+      .executeTakeFirst();
+
+    if (!contact) throw new Error();
+
+    if (emailAddresses?.length) {
+      await db
+        .deleteFrom("contact_emails")
+        .where("contact_id", "=", Number(contactId))
+        .executeTakeFirst();
+
+      for (const email of emailAddresses) {
+        await db
+          .insertInto("contact_emails")
+          .values({
+            email: email,
+            contact_id: contact.id,
+          })
+          .executeTakeFirst();
+      }
+    }
+
+    if (phones?.length) {
+      await db
+        .deleteFrom("contact_phones")
+        .where("contact_id", "=", Number(contactId))
+        .executeTakeFirst();
+
+      for (const phone of phones) {
+        await db
+          .insertInto("contact_phones")
+          .values({
+            phone: phone,
+            contact_id: contact.id,
+          })
+          .executeTakeFirst();
+      }
+    }
+
+    await db
+      .deleteFrom("contact_socials")
+      .where("contact_id", "=", Number(contactId))
+      .executeTakeFirst();
+
+    if (facebooks?.length) {
+      for (const url of facebooks) {
+        await db
+          .insertInto("contact_socials")
+          .values({
+            type: "facebook",
+            link: url,
+            contact_id: contact.id,
+          })
+          .executeTakeFirst();
+      }
+    }
+
+    if (instagrams?.length) {
+      for (const url of instagrams) {
+        await db
+          .insertInto("contact_socials")
+          .values({
+            type: "instagram",
+            link: url,
+            contact_id: contact.id,
+          })
+          .executeTakeFirst();
+      }
+    }
+
+    if (twitters?.length) {
+      for (const url of twitters) {
+        await db
+          .insertInto("contact_socials")
+          .values({
+            type: "twitter",
+            link: url,
+            contact_id: contact.id,
+          })
+          .executeTakeFirst();
+      }
+    }
+
+    if (linkedins?.length) {
+      for (const url of linkedins) {
+        await db
+          .insertInto("contact_socials")
+          .values({
+            type: "linkedin",
+            link: url,
+            contact_id: contact.id,
+          })
+          .executeTakeFirst();
+      }
+    }
+
+    console.log(userId);
+    res.json({
+      msg: "success!",
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(401).json({ error: "Invalid token" });
+  }
 });
 
-app.delete("/api/contact:id", (req, res) => {
-  // deletes a contact
+app.delete("/api/contact/:id", async (req, res) => {
+  const authHeader = req.headers.authorization;
+
+  const contactId = req.params.id;
+
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    res.status(401).json({ error: "Unauthorized" });
+    return;
+  }
+
+  const token = authHeader.split(" ")[1];
+  try {
+    const decoded = jwt.verify(token, SECRET_KEY) as { id: string };
+    const userId = decoded.id;
+
+    if (!userId) throw new Error();
+
+    await db
+      .deleteFrom("contacts")
+      .where("id", "=", Number(contactId))
+      .executeTakeFirst();
+
+    const contacts = await db
+      .selectFrom("contacts")
+      .selectAll()
+      .where("user_id", "=", Number(userId))
+      .execute();
+
+    res.json({
+      contacts,
+    });
+  } catch (err) {
+    res.status(401).json({ error: "Failed to delete contact's information" });
+  }
 });
 
 app.post("/api/contact/notes", (req, res) => {

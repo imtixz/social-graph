@@ -1,58 +1,9 @@
 import { useState } from "react";
 import Sidebar from "../components/Sidebar";
-import { MdDeleteOutline } from "react-icons/md";
 import axios from "axios";
+import { useNavigate } from "react-router";
 
-interface PhonesInput {
-  values: string[];
-  setValues: (x: string[]) => void;
-  fieldName: string;
-}
-
-function DynamicInput({ values, setValues, fieldName }: PhonesInput) {
-  const addPhone = () => {
-    setValues([...values, ""]);
-  };
-
-  const updatePhone = (index: number, value: string) => {
-    const updatedPhones = [...values];
-    updatedPhones[index] = value;
-    setValues(updatedPhones);
-  };
-
-  const deletePhone = (index: number) => {
-    const updatedPhones = values.filter((_, i) => i !== index);
-    setValues(updatedPhones);
-  };
-
-  return (
-    <div>
-      {values.map((value, index) => (
-        <div
-          key={index}
-          className="w-full rounded border border-gray-200 mt-2 flex items-center justify-between mb-2"
-        >
-          <input
-            type="text"
-            value={value}
-            onChange={(e) => updatePhone(index, e.target.value)}
-            placeholder={`Enter ${fieldName}`}
-            className="w-full h-full p-2"
-          />
-          <button
-            onClick={() => deletePhone(index)}
-            className="cursor-pointer px-2"
-          >
-            <MdDeleteOutline size={20} color="oklch(50.5% 0.213 27.518)" />
-          </button>
-        </div>
-      ))}
-      <p onClick={addPhone} className="text-gray-600 cursor-pointer mt-2">
-        + Add {fieldName}
-      </p>
-    </div>
-  );
-}
+import { DynamicInput } from "../components/DynamicInput";
 
 export default function AddContact() {
   // there will be a form here
@@ -68,13 +19,19 @@ export default function AddContact() {
   const [twitters, setTwitters] = useState<string[]>([]);
   const [linkedins, setLinkedins] = useState<string[]>([]);
 
-  const handleSubmit = () => {
-    axios.post(
+  const navigate = useNavigate();
+
+  const handleSubmit = async () => {
+    const token = localStorage.getItem("token");
+    const dob = new Date(dateOfBirth);
+    const response = await axios.post(
       "http://localhost:3000/api/contact",
       {
         name,
         address,
-        dateOfBirth,
+        dateOfBirth: `${String(dob.getMonth() + 1).padStart(2, "0")}-${String(
+          dob.getDate()
+        ).padStart(2, "0")}-${dob.getFullYear()}`,
         emailAddresses: emails,
         phones,
         facebooks,
@@ -84,11 +41,15 @@ export default function AddContact() {
       },
       {
         headers: {
-          Authorization:
-            "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ2MjYxNjc3LCJleHAiOjE3NDYzNDgwNzd9.n6M8HlYRuosxtTc5GiIMJ_zhP1O3zmu3RwfdltRqPs8",
+          Authorization: `Bearer ${token}`,
         },
       }
     );
+
+    if (response.status) {
+      alert("Successfully added the contact.");
+      navigate("/contacts");
+    }
   };
 
   return (
@@ -178,7 +139,7 @@ export default function AddContact() {
         </div>
 
         <button
-          className="px-6 py-2 cursor-pointer border mb-12 border-gray-200 hover:bg-green-800 hover:text-white rounded"
+          className="px-6 py-2 cursor-pointer border mb-12 border-gray-200 hover:bg-stone-800 hover:text-white rounded"
           onClick={handleSubmit}
         >
           Save

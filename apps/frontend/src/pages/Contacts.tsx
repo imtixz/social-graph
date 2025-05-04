@@ -56,12 +56,23 @@ export default function Contacts() {
                   </p>
                   <p
                     className="cursor-pointer"
-                    onClick={() => {
+                    onClick={async () => {
                       const confirmDelete = confirm(
-                        "Proceed with deleting this contact parmanently?"
+                        "Proceed with deleting this contact's information parmanently?"
                       );
                       if (confirmDelete) {
-                        console.log("deleted the things");
+                        const token = localStorage.getItem("token");
+                        const response = await axios.delete(
+                          `http://localhost:3000/api/contact/${contact.id}`,
+                          {
+                            headers: {
+                              Authorization: `Bearer ${token}`,
+                            },
+                          }
+                        );
+                        console.log(response.data);
+                        setContacts(response.data.contacts);
+                        alert("Successfully deleted the contact!");
                       }
                     }}
                   >
