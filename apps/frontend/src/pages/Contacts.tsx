@@ -28,6 +28,13 @@ export default function Contacts() {
     })();
   }, []);
 
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/auth/login");
+    }
+  }, []);
+
   return (
     <div className="flex gap-x-4 h-full font-mono">
       <Sidebar />
@@ -82,6 +89,14 @@ export default function Contacts() {
               </div>
             );
           })}
+          <p
+            className="border px-3 py-1.5 w-fit mt-6 cursor-pointer hover:text-white hover:bg-stone-800 rounded border-stone-300"
+            onClick={() => {
+              navigate("/contacts/add");
+            }}
+          >
+            + New Contact
+          </p>
         </div>
       </div>
     </div>

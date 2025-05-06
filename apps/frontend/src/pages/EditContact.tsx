@@ -105,6 +105,13 @@ export default function EditContact() {
     })();
   }, []);
 
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/auth/login");
+    }
+  }, []);
+
   return (
     <div className="flex gap-x-4 h-full font-mono">
       <Sidebar />

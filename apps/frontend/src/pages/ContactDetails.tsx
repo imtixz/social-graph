@@ -2,12 +2,14 @@ import { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
 import { MdDeleteOutline } from "react-icons/md";
 import axios from "axios";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 
 export default function ContactDetails() {
   const [contactDetails, setContactDetails] = useState<any>(null);
+  const [interactions, setInteractions] = useState<any[]>([]);
 
   const { contactId } = useParams();
+  const navigate = useNavigate();
 
   useEffect(() => {
     (async () => {
@@ -27,6 +29,31 @@ export default function ContactDetails() {
         console.error("No token found in localStorage");
       }
     })();
+
+    (async () => {
+      const token = localStorage.getItem("token");
+      if (token) {
+        const response = await axios.get(
+          `http://localhost:3000/api/contact/${contactId}/interactions`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        console.log(response.data);
+        setInteractions(response.data.interactions);
+      } else {
+        console.error("No token found in localStorage");
+      }
+    })();
+  }, []);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/auth/login");
+    }
   }, []);
 
   return (
@@ -74,56 +101,72 @@ export default function ContactDetails() {
               );
             })}
           </div>
-          {/* <div className="border p-4 rounded-xl border-gray-200 w-[500px] max-w-[500px]">
-            <p className="font-bold">Notes</p>
-            <div className="flex flex-col gap-y-2 mt-3">
-              <div className="p-2 border border-stone-200 rounded">
-                this is a sample note hehehehhe
-              </div>
-              <div className="p-2 border border-stone-200 rounded">
-                This is a sample note hehehehe
-              </div>
-              <p className="border px-4 py-2 rounded border-stone-200 cursor-pointer hover:text-white hover:bg-stone-800 w-fit mt-4 text-sm">
-                + New Note
-              </p>
-            </div>
-          </div> */}
           <div className="border p-4 rounded-xl border-gray-200 w-[600px] max-w-[700px]">
-            <p className="font-bold">Interactions</p>
-            <div className="flex flex-col gap-y-2 mt-3">
-              <div className="p-2 border border-stone-200 rounded flex flex-row justify-between">
-                <div>
-                  <p>got introduced to him at the career fest</p>
-                  <p className="text-sm text-stone-500 mt-3">15th June, 2024</p>
-                </div>
-                <p>
-                  <MdDeleteOutline
-                    size={20}
-                    color="oklch(50.5% 0.213 27.518)"
-                    className="cursor-pointer"
-                  />
-                </p>
-              </div>
-              <div className="p-2 border border-stone-200 rounded flex flex-row justify-between">
-                <div>
-                  <p>
-                    met him at the attention network movie night. talked about
-                    openings at Bangladesh Angel Network
+            <p className="font-bold mb-3">Timeline</p>
+            <div className="flex flex-col gap-y-2">
+              {interactions.map((interaction) => (
+                <div className="p-2 border border-stone-200 rounded flex flex-row justify-between">
+                  <div>
+                    <p>{interaction.description}</p>
+                    <p className="text-sm text-stone-500 mt-3">
+                      {new Date(interaction.date)
+                        .toLocaleDateString("en-US", {
+                          day: "numeric",
+                          month: "long",
+                          year: "numeric",
+                        })
+                        .replace(
+                          /(\d+)(?=\s)/,
+                          (day: any) =>
+                            `${day}${
+                              ["th", "st", "nd", "rd"][
+                                day % 10 > 3 ||
+                                Math.floor((day % 100) / 10) === 1
+                                  ? 0
+                                  : day % 10
+                              ]
+                            }`
+                        )}
+                    </p>
+                  </div>
+                  <p
+                    onClick={async () => {
+                      const confirmDelete = confirm(
+                        "Proceed with deleting this interaction parmanently?"
+                      );
+                      if (confirmDelete) {
+                        const token = localStorage.getItem("token");
+                        const res = await axios.delete(
+                          `http://localhost:3000/api/contact/interaction/${interaction.id}`,
+                          {
+                            headers: {
+                              Authorization: `Bearer ${token}`,
+                            },
+                          }
+                        );
+
+                        setInteractions(res.data.interactions);
+                        alert("Successfully deleted the interaction!");
+                      }
+                    }}
+                  >
+                    <MdDeleteOutline
+                      size={20}
+                      color="oklch(50.5% 0.213 27.518)"
+                      className="cursor-pointer"
+                    />
                   </p>
-                  <p className="text-sm text-stone-500 mt-3">15th June, 2024</p>
                 </div>
-                <p>
-                  <MdDeleteOutline
-                    size={20}
-                    color="oklch(50.5% 0.213 27.518)"
-                    className="cursor-pointer"
-                  />
-                </p>
-              </div>
-              <p className="border px-4 py-2 rounded border-stone-200 cursor-pointer hover:text-white hover:bg-stone-800 w-fit mt-4 text-sm">
-                + New Interaction
-              </p>
+              ))}
             </div>
+            <p
+              className="border px-4 py-2 rounded border-stone-200 cursor-pointer hover:text-white hover:bg-stone-800 w-fit mt-4 text-sm"
+              onClick={() => {
+                navigate("/interactions/add");
+              }}
+            >
+              + New Interaction
+            </p>
           </div>
         </div>
       </div>

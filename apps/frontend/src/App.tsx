@@ -5,6 +5,10 @@ import AddContact from "./pages/AddContact";
 import Login from "./pages/Login";
 import ContactDetails from "./pages/ContactDetails";
 import EditContact from "./pages/EditContact";
+import AddInteraction from "./pages/AddInteraction";
+import Interactions from "./pages/Interactions";
+import Reminders from "./pages/Reminders";
+import Profile from "./pages/Profile";
 
 function App() {
   return (
@@ -15,6 +19,10 @@ function App() {
       <Route path="/contacts/add" element={<AddContact />} />
       <Route path="/contacts/:contactId" element={<ContactDetails />} />
       <Route path="/contacts/edit/:contactId" element={<EditContact />} />
+      <Route path="/interactions" element={<Interactions />} />
+      <Route path="/interactions/add" element={<AddInteraction />} />
+      <Route path="/reminders" element={<Reminders />} />
+      <Route path="/profile" element={<Profile />} />
     </Routes>
   );
 }

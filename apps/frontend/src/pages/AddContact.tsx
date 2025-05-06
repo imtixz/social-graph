@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
 import axios from "axios";
 import { useNavigate } from "react-router";
@@ -6,9 +6,6 @@ import { useNavigate } from "react-router";
 import { DynamicInput } from "../components/DynamicInput";
 
 export default function AddContact() {
-  // there will be a form here
-  // form will contain name, address, date of birth, addresses, phones and social links
-
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
   const [dateOfBirth, setDateOfBirth] = useState("");
@@ -51,6 +48,13 @@ export default function AddContact() {
       navigate("/contacts");
     }
   };
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/auth/login");
+    }
+  }, []);
 
   return (
     <div className="flex gap-x-8 h-full">

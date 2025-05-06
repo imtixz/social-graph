@@ -1,8 +1,16 @@
 import { useNavigate } from "react-router";
 import Sidebar from "../components/Sidebar";
+import { useEffect } from "react";
 
 export default function Home() {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/auth/login");
+    }
+  }, []);
 
   return (
     <div className="flex gap-x-4 h-full">
