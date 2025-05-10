@@ -1,14 +1,15 @@
 import { DB } from "./db/db";
 import { Pool } from "pg";
 import { Kysely, PostgresDialect } from "kysely";
+import { DB_NAME, DB_HOST, DB_USER, DB_PASSWORD, DB_PORT } from "./env";
 
 const dialect = new PostgresDialect({
   pool: new Pool({
-    database: "social_graph",
-    host: "localhost",
-    user: "admin",
-    password: "password",
-    port: 5436,
+    database: DB_NAME,
+    host: DB_HOST,
+    user: DB_USER,
+    password: DB_PASSWORD,
+    port: DB_PORT,
     max: 10,
   }),
 });
