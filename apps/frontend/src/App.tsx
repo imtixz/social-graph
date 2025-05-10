@@ -10,11 +10,14 @@ import Interactions from "./pages/Interactions";
 import Reminders from "./pages/Reminders";
 import Profile from "./pages/Profile";
 import AddReminder from "./pages/AddReminder";
+import ChangePassword from "./pages/ChangePassword";
+import Register from "./pages/Register";
 
 function App() {
   return (
     <Routes>
       <Route path="/auth/login" element={<Login />} />
+      <Route path="/auth/register" element={<Register />} />
       <Route path="/" element={<Home />} />
       <Route path="/contacts" element={<Contacts />} />
       <Route path="/contacts/add" element={<AddContact />} />
@@ -25,6 +28,7 @@ function App() {
       <Route path="/reminders" element={<Reminders />} />
       <Route path="/reminders/create" element={<AddReminder />} />
       <Route path="/profile" element={<Profile />} />
+      <Route path="/profile/change-password" element={<ChangePassword />} />
     </Routes>
   );
 }

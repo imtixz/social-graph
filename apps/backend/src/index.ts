@@ -44,11 +44,131 @@ app.post("/login", async (req, res) => {
     email: user?.email,
     token,
   });
+});
+
+app.post("/register", async (req, res) => {
+  const { name, email, password } = req.body;
+  const hash = crypto.createHash("sha256").update(password).digest("hex");
+
+  const user = await db
+    .insertInto("users")
+    .values({
+      name,
+      email,
+      password: hash,
+    })
+    .returning(["id", "email"])
+    .executeTakeFirst();
+
+  const token = jwt.sign({ id: user?.id }, SECRET_KEY, {
+    expiresIn: "1d",
+  });
 
   res.json({
     id: user?.id,
     email: user?.email,
+    token,
   });
+});
+
+app.get("/api/profile", async (req, res) => {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    res.status(401).json({ error: "Unauthorized" });
+    return;
+  }
+
+  const token = authHeader.split(" ")[1];
+
+  try {
+    const decoded = jwt.verify(token, SECRET_KEY) as { id: string };
+    const userId = decoded.id;
+
+    if (!userId) throw new Error();
+
+    const user = await db
+      .selectFrom("users")
+      .select(["id", "email", "name"])
+      .where("id", "=", Number(userId))
+      .executeTakeFirst();
+
+    res.json({
+      user,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(400).json({ error: "Something went wront!" });
+  }
+});
+
+app.post("/api/profile", async (req, res) => {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    res.status(401).json({ error: "Unauthorized" });
+    return;
+  }
+
+  const token = authHeader.split(" ")[1];
+
+  try {
+    const decoded = jwt.verify(token, SECRET_KEY) as { id: string };
+    const userId = decoded.id;
+
+    if (!userId) throw new Error();
+
+    const { name } = req.body;
+
+    await db
+      .updateTable("users")
+      .set("name", name)
+      .where("id", "=", Number(userId))
+      .executeTakeFirst();
+
+    res.json({
+      msg: "Success!",
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(400).json({ error: "Something went wront!" });
+  }
+});
+
+app.post("/api/profile/change-password", async (req, res) => {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    res.status(401).json({ error: "Unauthorized" });
+    return;
+  }
+
+  const token = authHeader.split(" ")[1];
+
+  try {
+    const decoded = jwt.verify(token, SECRET_KEY) as { id: string };
+    const userId = decoded.id;
+
+    if (!userId) throw new Error();
+
+    const { password } = req.body;
+    const hash = crypto.createHash("sha256").update(password).digest("hex");
+
+    await db
+      .updateTable("users")
+      .where("id", "=", Number(userId))
+      .set({
+        password: hash,
+      })
+      .executeTakeFirst();
+
+    res.json({
+      msg: "Success!",
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(400).json({ error: "Something went wront!" });
+  }
 });
 
 app.get("/api/contact", async (req, res) => {

@@ -66,6 +66,13 @@ export default function AddInteraction() {
     })();
   }, []);
 
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/auth/login");
+    }
+  }, []);
+
   return (
     <div className="flex gap-x-8 h-full">
       <Sidebar />
