@@ -1,5 +1,3 @@
-import { IoIosSearch } from "react-icons/io";
-import { PiMagicWandLight } from "react-icons/pi";
 import { IoHomeOutline } from "react-icons/io5";
 import { IoPersonOutline } from "react-icons/io5";
 import { IoMdAlarm } from "react-icons/io";

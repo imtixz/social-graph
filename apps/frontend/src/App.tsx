@@ -9,6 +9,7 @@ import AddInteraction from "./pages/AddInteraction";
 import Interactions from "./pages/Interactions";
 import Reminders from "./pages/Reminders";
 import Profile from "./pages/Profile";
+import AddReminder from "./pages/AddReminder";
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
       <Route path="/interactions" element={<Interactions />} />
       <Route path="/interactions/add" element={<AddInteraction />} />
       <Route path="/reminders" element={<Reminders />} />
+      <Route path="/reminders/create" element={<AddReminder />} />
       <Route path="/profile" element={<Profile />} />
     </Routes>
   );

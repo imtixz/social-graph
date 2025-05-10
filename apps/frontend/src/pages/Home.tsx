@@ -13,29 +13,20 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="flex gap-x-4 h-full">
+    <div className="flex gap-x-4 h-full font-mono">
       <Sidebar />
-      <div className="overflow-auto w-full p-4 flex flex-col gap-y-4">
-        <div className="border-b border-gray-200">
-          <p className="text-sm">Today</p>
-          <p>Reconnect with Eren Yeager</p>
-          <p>Recoonect with Zeke Yeager</p>
-        </div>
-        <div className="border-b border-gray-200">
-          <p className="text-sm">Tomorrow</p>
-          <p>Wish Happy Birthday to Levy Ackerman</p>
-        </div>
+      <div className="overflow-auto p-4 flex flex-col gap-y-4 w-[600px]">
         <div>
           <p className="my-2">Quick Access:</p>
-          <div className="flex flex-row gap-x-4">
-            <p className="border py-2 px-4 max-w-fit rounded hover:underline cursor-pointer">
+          <div className="flex flex-row gap-y-2 gap-x-2">
+            <p className="border py-2 px-4 max-w-fit rounded hover:text-white hover:bg-stone-800 cursor-pointer text-center border-stone-300">
               Log Interaction
             </p>
-            <p className="border py-2 px-4 max-w-fit rounded hover:underline cursor-pointer">
+            <p className="border py-2 px-4 max-w-fit rounded hover:text-white hover:bg-stone-800 cursor-pointer text-center border-stone-300">
               Set Reminder
             </p>
             <p
-              className="border py-2 px-4 max-w-fit rounded hover:underline cursor-pointer"
+              className="border py-2 px-4 max-w-fit rounded hover:text-white hover:bg-stone-800 cursor-pointer text-center border-stone-300"
               onClick={() => {
                 navigate("/contacts/add");
               }}
