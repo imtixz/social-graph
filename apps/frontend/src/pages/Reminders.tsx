@@ -4,10 +4,8 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 
 export default function Reminders() {
-  const [reminders, setReminders] = useState([]);
   const [reminderKeys, setReminderKeys] = useState<any[]>([]);
   const [reminderDisplay, setReminderDisplay] = useState<any>({});
-  const [contactsInReminders, setContactsInReminders] = useState<any[]>([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -23,8 +21,6 @@ export default function Reminders() {
           }
         );
         console.log(response.data, "<--- repsponse data");
-        setContactsInReminders(response.data.contactsInReminders);
-        setReminders(response.data.reminders);
 
         let reminderDates: any[] = [];
         const allReminders = [
