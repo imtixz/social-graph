@@ -41,3 +41,9 @@ exports.up = (pgm) => {
 exports.down = (pgm) => {
   pgm.dropTable("contacts_in_reminder");
 };
+
+// CREATE TABLE contacts_in_reminder (
+//   contact_id INTEGER NOT NULL REFERENCES contacts(id) ON DELETE CASCADE,
+//   reminder_id INTEGER NOT NULL REFERENCES reminders(id) ON DELETE CASCADE,
+//   PRIMARY KEY (contact_id, reminder_id)
+// );

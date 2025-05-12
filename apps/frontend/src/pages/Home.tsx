@@ -19,10 +19,16 @@ export default function Home() {
         <div>
           <p className="my-2">Quick Access:</p>
           <div className="flex flex-row gap-y-2 gap-x-2">
-            <p className="border py-2 px-4 max-w-fit rounded hover:text-white hover:bg-stone-800 cursor-pointer text-center border-stone-300">
+            <p
+              className="border py-2 px-4 max-w-fit rounded hover:text-white hover:bg-stone-800 cursor-pointer text-center border-stone-300"
+              onClick={() => navigate("/interactions/add")}
+            >
               Log Interaction
             </p>
-            <p className="border py-2 px-4 max-w-fit rounded hover:text-white hover:bg-stone-800 cursor-pointer text-center border-stone-300">
+            <p
+              className="border py-2 px-4 max-w-fit rounded hover:text-white hover:bg-stone-800 cursor-pointer text-center border-stone-300"
+              onClick={() => navigate("/reminders/create")}
+            >
               Set Reminder
             </p>
             <p

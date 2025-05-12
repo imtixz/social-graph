@@ -39,3 +39,10 @@ exports.up = (pgm) => {
 exports.down = (pgm) => {
   pgm.dropTable("users");
 };
+
+// CREATE TABLE users (
+//   id SERIAL PRIMARY KEY NOT NULL,
+//   name TEXT NOT NULL,
+//   email TEXT NOT NULL UNIQUE,
+//   password TEXT
+// );

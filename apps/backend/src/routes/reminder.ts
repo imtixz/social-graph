@@ -21,13 +21,18 @@ export const registerReminderRoutes = (app: Express) => {
 
       if (!userId) throw new Error();
 
-      // gets all the reminders that are
+      // SELECT * FROM reminders WHERE user_id=${userId};
       const reminders = await db
         .selectFrom("reminders")
         .selectAll()
         .where("user_id", "=", Number(userId))
         .execute();
 
+      // SELECT contacts.id AS contactId, contacts.name, reminders.id AS reminderId
+      // FROM contacts
+      // LEFT JOIN contacts_in_reminder ON contacts_in_reminder.contact_id = contacts.id
+      // LEFT JOIN reminders ON reminders.id = contacts_in_reminder.reminder_id
+      // WHERE reminders.user_id = ${userId};
       const contactsInReminders = await db
         .selectFrom("contacts")
         .leftJoin(
@@ -48,6 +53,7 @@ export const registerReminderRoutes = (app: Express) => {
         ])
         .execute();
 
+      // SELECT * FROM contacts WHERE user_id=${userId};
       const contacts = await db
         .selectFrom("contacts")
         .selectAll()
@@ -117,6 +123,9 @@ export const registerReminderRoutes = (app: Express) => {
         date: string;
       } = req.body;
 
+      // INSERT INTO reminders (user_id, title, body, remind_on)
+      // VALUES (${(userId)}, '${title}', '${body}', ${date})
+      // RETURNING id;
       const reminder = await db
         .insertInto("reminders")
         .values({
@@ -129,6 +138,8 @@ export const registerReminderRoutes = (app: Express) => {
         .executeTakeFirst();
 
       for (const contactId of relevantContacts) {
+        // INSERT INTO contacts_in_reminder (reminder_id, contact_id)
+        // VALUES (${reminder.id}, ${contactId});
         await db
           .insertInto("contacts_in_reminder")
           .values({

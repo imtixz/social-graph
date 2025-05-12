@@ -34,3 +34,9 @@ exports.up = (pgm) => {
 exports.down = (pgm) => {
   pgm.dropTable("contact_emails");
 };
+
+// CREATE TABLE contact_emails (
+//   email TEXT NOT NULL,
+//   contact_id INTEGER NOT NULL REFERENCES contacts(id) ON DELETE CASCADE,
+//   PRIMARY KEY (email, contact_id)
+// );

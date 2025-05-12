@@ -44,3 +44,11 @@ exports.up = (pgm) => {
 exports.down = (pgm) => {
   pgm.dropTable("reminders");
 };
+
+// CREATE TABLE reminders (
+//   id SERIAL PRIMARY KEY NOT NULL,
+//   title TEXT NOT NULL,
+//   body TEXT NOT NULL,
+//   remind_on TIMESTAMP,
+//   user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE
+// );

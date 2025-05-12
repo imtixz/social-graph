@@ -34,3 +34,9 @@ exports.up = (pgm) => {
 exports.down = (pgm) => {
   pgm.dropTable("contact_phones");
 };
+
+// CREATE TABLE "contact_phones" (
+//   "phone" TEXT NOT NULL,
+//   "contact_id" INTEGER NOT NULL REFERENCES "contacts"("id") ON DELETE CASCADE,
+//   PRIMARY KEY ("phone", "contact_id")
+// );

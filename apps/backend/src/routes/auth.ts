@@ -7,6 +7,8 @@ import { SECRET_KEY } from "../env";
 export const registerAuthRotues = (app: Express) => {
   app.post("/login", async (req, res) => {
     const { email, password } = req.body;
+
+    // SELECT * FROM users WHERE email='${email}' LIMIT 1;
     const user = await db
       .selectFrom("users")
       .selectAll()
@@ -38,6 +40,7 @@ export const registerAuthRotues = (app: Express) => {
     const { name, email, password } = req.body;
     const hash = crypto.createHash("sha256").update(password).digest("hex");
 
+    // INSERT INTO users (name, email, password) VALUES ('${name}', '${email}', '${hash}') RETURNING id, email;
     const user = await db
       .insertInto("users")
       .values({

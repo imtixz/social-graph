@@ -47,3 +47,17 @@ exports.down = (pgm) => {
   pgm.dropTable("contact_socials");
   pgm.dropType("social_type");
 };
+
+// CREATE TYPE social_type AS ENUM (
+//   'facebook',
+//   'instagram',
+//   'twitter',
+//   'linkedin'
+// );
+
+// CREATE TABLE contact_socials (
+//   link TEXT NOT NULL,
+//   type social_type NOT NULL,
+//   contact_id INTEGER NOT NULL REFERENCES contacts(id) ON DELETE CASCADE,
+//   PRIMARY KEY (link, type, contact_id)
+// );

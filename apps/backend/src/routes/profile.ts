@@ -21,6 +21,7 @@ export const registerProfileRoutes = (app: Express) => {
 
       if (!userId) throw new Error();
 
+      // SELECT id, email, name FROM users WHERE id=${userId} LIMIT 1;
       const user = await db
         .selectFrom("users")
         .select(["id", "email", "name"])
@@ -54,6 +55,7 @@ export const registerProfileRoutes = (app: Express) => {
 
       const { name } = req.body;
 
+      // UPDATE users SET name='${name}' WHERE id=${userId};
       await db
         .updateTable("users")
         .set("name", name)
@@ -88,6 +90,7 @@ export const registerProfileRoutes = (app: Express) => {
       const { password } = req.body;
       const hash = crypto.createHash("sha256").update(password).digest("hex");
 
+      // UPDATE users SET password='${hash}' WHERE id=${userId};
       await db
         .updateTable("users")
         .where("id", "=", Number(userId))

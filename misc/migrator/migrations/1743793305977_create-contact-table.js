@@ -44,3 +44,11 @@ exports.up = (pgm) => {
 exports.down = (pgm) => {
   pgm.dropTable("contacts");
 };
+
+// CREATE TABLE contacts (
+//   id SERIAL PRIMARY KEY NOT NULL,
+//   name TEXT NOT NULL,
+//   address TEXT NOT NULL,
+//   date_of_birth DATE,
+//   user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE
+// );

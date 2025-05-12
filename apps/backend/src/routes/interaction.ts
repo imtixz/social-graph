@@ -1,6 +1,5 @@
 import type { Express } from "express";
 import { db } from "../kysely";
-import crypto from "crypto";
 import jwt from "jsonwebtoken";
 import { SECRET_KEY } from "../env";
 
@@ -19,7 +18,16 @@ export const registerInteractionRoutes = (app: Express) => {
       const decoded = jwt.verify(token, SECRET_KEY) as { id: string };
       const userId = decoded.id;
 
-      // route logic here
+      //   SELECT
+      //     interactions.id,
+      //     interactions.description,
+      //     interactions.date,
+      //     interactions.contact_id,
+      //     contacts.name
+      //   FROM interactions
+      //   LEFT JOIN contacts ON interactions.contact_id = contacts.id
+      //   WHERE user_id = ${userId}
+      //   ORDER BY interactions.date DESC
       const interactions = await db
         .selectFrom("interactions")
         .leftJoin("contacts", "interactions.contact_id", "contacts.id")
@@ -59,7 +67,7 @@ export const registerInteractionRoutes = (app: Express) => {
       const userId = decoded.id;
       const contactId = req.params.id;
 
-      // route logic here
+      // SELECT * FROM interactions WHERE contact_id=${contactId}
       const interactions = await db
         .selectFrom("interactions")
         .selectAll()
@@ -95,6 +103,7 @@ export const registerInteractionRoutes = (app: Express) => {
 
       console.log(contactId, description, date);
 
+      // INSERT INTO interactions (contact_id, description, date) VALUES (${contact_id}, '${description}', ${date})
       await db
         .insertInto("interactions")
         .values({
@@ -130,11 +139,22 @@ export const registerInteractionRoutes = (app: Express) => {
       const userId = decoded.id;
       const interactionId = req.params.interactionId;
 
+      // DELETE FROM interactions WHERE id=${interactionId}
       await db
         .deleteFrom("interactions")
         .where("id", "=", Number(interactionId))
         .executeTakeFirst();
 
+      // SELECT
+      //   interactions.id,
+      //   interactions.description,
+      //   interactions.date,
+      //   interactions.contact_id,
+      //   contacts.name
+      // FROM interactions
+      // LEFT JOIN contacts ON interactions.contact_id = contacts.id
+      // WHERE user_id = ${userId}
+      // ORDER BY interactions.date DESC;
       const interactions = await db
         .selectFrom("interactions")
         .leftJoin("contacts", "interactions.contact_id", "contacts.id")
@@ -178,13 +198,16 @@ export const registerInteractionRoutes = (app: Express) => {
         const contactId = req.params.contactId;
         const interactionId = req.params.interactionId;
 
+        // DELETE FROM interactions WHERE id=${interactionId};
         await db
           .deleteFrom("interactions")
           .where("id", "=", Number(interactionId))
           .executeTakeFirst();
 
+        // SELECT * FROM interactions WHERE contact_id=${contactId};
         const interactions = await db
           .selectFrom("interactions")
+          .selectAll()
           .where("contact_id", "=", Number(contactId))
           .execute();
 

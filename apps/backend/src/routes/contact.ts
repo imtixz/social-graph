@@ -22,6 +22,7 @@ export const registerContactRoutes = (app: Express) => {
 
       if (!userId) throw new Error();
 
+      // SELECT * FROM contacts WHERE user_id=${userId};
       const contacts = await db
         .selectFrom("contacts")
         .selectAll()
@@ -79,6 +80,9 @@ export const registerContactRoutes = (app: Express) => {
       console.log(req.body, "<--- this is req.body");
       console.log(new Date("07-14-03"), "<--- this is date of birth");
 
+      // INSERT INTO contacts (name, address, date_of_birth, user_id)
+      // VALUES ('${name}', '${address}', ${dateOfBirth}, ${userId})
+      // RETURNING id;
       const contact = await db
         .insertInto("contacts")
         .values({
@@ -94,6 +98,8 @@ export const registerContactRoutes = (app: Express) => {
 
       if (emailAddresses?.length) {
         for (const email of emailAddresses) {
+          // INSERT INTO contact_emails (email, contact_id)
+          // VALUES ('${email}', ${contact.id});
           await db
             .insertInto("contact_emails")
             .values({
@@ -106,6 +112,8 @@ export const registerContactRoutes = (app: Express) => {
 
       if (phones?.length) {
         for (const phone of phones) {
+          // INSERT INTO contact_phones (phone, contact_id)
+          // VALUES ('${phone}', ${contact.id});
           await db
             .insertInto("contact_phones")
             .values({
@@ -118,6 +126,8 @@ export const registerContactRoutes = (app: Express) => {
 
       if (facebooks?.length) {
         for (const url of facebooks) {
+          // INSERT INTO contact_socials (type, link, contact_id)
+          // VALUES ('facebook', '${url}', ${contact.id});
           await db
             .insertInto("contact_socials")
             .values({
@@ -131,6 +141,8 @@ export const registerContactRoutes = (app: Express) => {
 
       if (instagrams?.length) {
         for (const url of instagrams) {
+          // INSERT INTO contact_socials (type, link, contact_id)
+          // VALUES ('instagram', '${url}', ${contact.id});
           await db
             .insertInto("contact_socials")
             .values({
@@ -144,6 +156,8 @@ export const registerContactRoutes = (app: Express) => {
 
       if (twitters?.length) {
         for (const url of twitters) {
+          // INSERT INTO contact_socials (type, link, contact_id)
+          // VALUES ('twitter', '${url}', ${contact.id});
           await db
             .insertInto("contact_socials")
             .values({
@@ -157,6 +171,8 @@ export const registerContactRoutes = (app: Express) => {
 
       if (linkedins?.length) {
         for (const url of linkedins) {
+          // INSERT INTO contact_socials (type, link, contact_id)
+          // VALUES ('linkedin', '${url}', ${contact.id});
           await db
             .insertInto("contact_socials")
             .values({
@@ -194,24 +210,28 @@ export const registerContactRoutes = (app: Express) => {
 
       if (!userId) throw new Error();
 
+      // SELECT * FROM contacts WHERE id=${contactId} LIMIT 1;
       const contact = await db
         .selectFrom("contacts")
         .selectAll()
         .where("id", "=", Number(contactId))
         .executeTakeFirst();
 
+      // SELECT * FROM conact_phones WHERE contact_id=${contactId}
       const phones = await db
         .selectFrom("contact_phones")
         .selectAll()
         .where("contact_id", "=", Number(contactId))
         .execute();
 
+      // SELECT * FROM conact_emails WHERE contact_id=${contactId}
       const emailAddresses = await db
         .selectFrom("contact_emails")
         .selectAll()
         .where("contact_id", "=", Number(contactId))
         .execute();
 
+      // SELECT * FROM conact_socials WHERE contact_id=${contactId}
       const socials = await db
         .selectFrom("contact_socials")
         .selectAll()
@@ -270,6 +290,10 @@ export const registerContactRoutes = (app: Express) => {
         linkedins: string[];
       } = req.body;
 
+      // UPDATE contacts
+      // SET name='${name}', address='${address}', date_of_birth=${dateOfBirth}, user_id=${userId}
+      // WHERE id=${contactId}
+      // RETURNING id;
       const contact = await db
         .updateTable("contacts")
         .where("id", "=", Number(contactId))
@@ -285,12 +309,15 @@ export const registerContactRoutes = (app: Express) => {
       if (!contact) throw new Error();
 
       if (emailAddresses?.length) {
+        // DELETE FROM contact_emails WHERE contact_id=${contactId}
         await db
           .deleteFrom("contact_emails")
           .where("contact_id", "=", Number(contactId))
           .executeTakeFirst();
 
         for (const email of emailAddresses) {
+          // INSERT INTO contact_emails (email, contact_id)
+          // VALUES ('${email}', ${contact.id});
           await db
             .insertInto("contact_emails")
             .values({
@@ -302,12 +329,15 @@ export const registerContactRoutes = (app: Express) => {
       }
 
       if (phones?.length) {
+        // DELETE FROM contact_phones WHERE contact_id=${contactId};
         await db
           .deleteFrom("contact_phones")
           .where("contact_id", "=", Number(contactId))
           .executeTakeFirst();
 
         for (const phone of phones) {
+          // INSERT INTO contact_phones (phone, contact_id)
+          // VALUES ('${phone}', ${contact.id});
           await db
             .insertInto("contact_phones")
             .values({
@@ -319,12 +349,15 @@ export const registerContactRoutes = (app: Express) => {
       }
 
       await db
+        // DELETE FROM contact_socials WHERE contact_id=${contactId};
         .deleteFrom("contact_socials")
         .where("contact_id", "=", Number(contactId))
         .executeTakeFirst();
 
       if (facebooks?.length) {
         for (const url of facebooks) {
+          // INSERT INTO contact_socials (type, link, contact_id)
+          // VALUES ('facebook', '${url}', ${contact.id});
           await db
             .insertInto("contact_socials")
             .values({
@@ -338,6 +371,8 @@ export const registerContactRoutes = (app: Express) => {
 
       if (instagrams?.length) {
         for (const url of instagrams) {
+          // INSERT INTO contact_socials (type, link, contact_id)
+          // VALUES ('instagram', '${url}', ${contact.id});
           await db
             .insertInto("contact_socials")
             .values({
@@ -351,6 +386,8 @@ export const registerContactRoutes = (app: Express) => {
 
       if (twitters?.length) {
         for (const url of twitters) {
+          // INSERT INTO contact_socials (type, link, contact_id)
+          // VALUES ('twitter', '${url}', ${contact.id});
           await db
             .insertInto("contact_socials")
             .values({
@@ -364,6 +401,8 @@ export const registerContactRoutes = (app: Express) => {
 
       if (linkedins?.length) {
         for (const url of linkedins) {
+          // INSERT INTO contact_socials (type, link, contact_id)
+          // VALUES ('linkedin', '${url}', ${contact.id});
           await db
             .insertInto("contact_socials")
             .values({
@@ -402,11 +441,13 @@ export const registerContactRoutes = (app: Express) => {
 
       if (!userId) throw new Error();
 
+      // DELETE FROM contacts WHERE id=${contactId};
       await db
         .deleteFrom("contacts")
         .where("id", "=", Number(contactId))
         .executeTakeFirst();
 
+      // SELECT * FROM contacts WHERE user_id=${userId}
       const contacts = await db
         .selectFrom("contacts")
         .selectAll()
